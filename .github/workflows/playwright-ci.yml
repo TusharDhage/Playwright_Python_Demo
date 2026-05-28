@@ -43,6 +43,8 @@ jobs:
         run: playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run tests
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           mkdir -p reports/screenshots
           pytest tests/ \
