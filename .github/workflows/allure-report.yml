@@ -7,12 +7,9 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 jobs:
   test-and-report:
-    name: Run tests and publish Allure report
     runs-on: ubuntu-latest
 
     steps:
@@ -32,24 +29,29 @@ jobs:
       - name: Install Playwright browsers
         run: playwright install --with-deps chromium
 
-      - name: Run tests and generate Allure results
+      - name: Run tests
         env:
           PYTHONPATH: ${{ github.workspace }}
           TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
           BASE_URL: ${{ secrets.BASE_URL }}
         run: |
-          mkdir -p allure-results
-          mkdir -p reports/screenshots
-          pytest tests/ \
-            --browser chromium \
-            --alluredir=allure-results \
-            -v
+          mkdir -p allure-results reports/screenshots
+          pytest tests/ --browser chromium --alluredir=allure-results -v
         continue-on-error: true
 
-      - name: Check allure-results content
-        run: |
-          echo "Allure results files:"
-          ls -la allure-results/ || echo "No allure-results folder"
+      - name: Generate Allure report
+        uses: simple-elf/allure-report-action@master
+        with:
+          allure_results: allure-results
+          allure_report: allure-report
+          allure_history: allure-history
+          keep_reports: 20
 
-      - name: Get Allure history from gh-pages
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
+          force_orphan: true
