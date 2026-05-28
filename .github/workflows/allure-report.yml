@@ -47,37 +47,9 @@ jobs:
             -v
         continue-on-error: true
 
-      - name: Load previous Allure history
-        uses: actions/checkout@v4
-        continue-on-error: true
-        with:
-          ref: gh-pages
-          path: gh-pages
-
-      - name: Copy history from previous run
-        continue-on-error: true
+      - name: Check allure-results content
         run: |
-          mkdir -p allure-results/history
-          cp -r gh-pages/history/* allure-results/history/ 2>/dev/null || true
+          echo "Allure results files:"
+          ls -la allure-results/ || echo "No allure-results folder"
 
-      - name: Generate Allure HTML report
-        uses: simple-elf/allure-report-action@master
-        with:
-          allure_results: allure-results
-          allure_history: allure-history
-          keep_reports: 20
-
-      - name: Publish Allure report to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: allure-history
-
-      - name: Upload raw Allure results as artifact
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: allure-results
-          path: allure-results/
-          retention-days: 14
+      - name: Get Allure history from gh-pages
