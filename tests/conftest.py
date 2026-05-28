@@ -1,32 +1,5 @@
 import pytest
 import os
-from playwright.sync_api import sync_playwright
-
-def pytest_addoption(parser):
-    parser.addoption(
-        "--browser-name",
-        action="store",
-        default="chromium",
-        help="Browser to run tests on: chromium, firefox, webkit"
-    )
-
-@pytest.fixture(scope="function")
-def page(request):
-    browser_name = request.config.getoption("--browser-name", default="chromium")
-
-    with sync_playwright() as p:
-        # Launch the correct browser based on CLI arg
-        browser_map = {
-            "chromium": p.chromium,
-            "firefox":  p.firefox,
-            "webkit":   p.webkit,
-        }
-        browser = browser_map.get(browser_name, p.chromium).launch(headless=True)
-        context = browser.new_context()
-        page = context.new_page()
-        yield page
-        context.close()
-        browser.close()
 
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
