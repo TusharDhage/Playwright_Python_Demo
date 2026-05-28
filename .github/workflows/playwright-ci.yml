@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-      fail-fast: false        # don't cancel other browsers if one fails
+      fail-fast: false
       matrix:
         browser: [chromium, firefox, webkit]
 
@@ -39,7 +39,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Install Playwright browser
+      - name: Install Playwright browsers
         run: playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run tests
