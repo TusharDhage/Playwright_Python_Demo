@@ -47,11 +47,13 @@ jobs:
         run: pytest tests/ --html=reports/report.html --self-contained-html -v
         continue-on-error: true   # So report still uploads even if tests fail
 
-      # 7. Upload HTML report as artifact
-      - name: Upload test report
+      # 7. Upload HTML report AND screenshots as artifacts
+      - name: Upload test report and screenshots
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-test-report
-          path: reports/report.html
+          path: |
+            reports/report.html
+            reports/screenshots/
           retention-days: 14
