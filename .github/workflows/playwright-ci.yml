@@ -45,6 +45,9 @@ jobs:
       - name: Run tests
         env:
           PYTHONPATH: ${{ github.workspace }}
+          TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+          BASE_URL: ${{ secrets.BASE_URL }}
         run: |
           mkdir -p reports/screenshots
           pytest tests/ \

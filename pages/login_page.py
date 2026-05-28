@@ -1,7 +1,8 @@
 from pages.base_page import BasePage
+from utils.config import Config
 
 class LoginPage(BasePage):
-    URL = "https://practicetestautomation.com/practice-test-login/"
+    URL = Config.BASE_URL
 
     # Locators
     USERNAME_INPUT = "#username"
@@ -13,7 +14,10 @@ class LoginPage(BasePage):
     def open(self):
         self.navigate(self.URL)
 
-    def login(self, username, password):
+    def login(self, username=None, password=None):
+        # Use config defaults if no args passed
+        username = username or Config.USERNAME
+        password = password or Config.PASSWORD
         self.fill(self.USERNAME_INPUT, username)
         self.fill(self.PASSWORD_INPUT, password)
         self.click(self.LOGIN_BUTTON)
