@@ -1,17 +1,13 @@
-name: Playwright Tests
+name: Nightly Regression
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-  workflow_dispatch:
   schedule:
-    - cron: '30 15 * * 1-5'
+    - cron: '30 15 * * 1-5'   # 9pm IST every weekday
+  workflow_dispatch:            # allow manual trigger too
 
 jobs:
-  test:
-    name: Tests on ${{ matrix.browser }}
+  nightly_regression:
+    name: Nightly - ${{ matrix.browser }}
     runs-on: ubuntu-latest
 
     strategy:
@@ -44,8 +40,7 @@ jobs:
       - name: Install Playwright browsers
         run: playwright install --with-deps ${{ matrix.browser }}
 
-      - name: Run smoke tests on push
-        if: github.event_name == 'push' || github.event_name == 'pull_request'
+      - name: Run full regression suite
         env:
           PYTHONPATH: ${{ github.workspace }}
           TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
@@ -53,35 +48,19 @@ jobs:
           BASE_URL: ${{ secrets.BASE_URL }}
         run: |
           mkdir -p reports/screenshots
-          pytest tests/ -m smoke \
+          pytest tests/ -m regression \
             --browser ${{ matrix.browser }} \
-            --html=reports/${{ matrix.browser }}_report.html \
+            --html=reports/nightly_${{ matrix.browser }}_report.html \
             --self-contained-html \
             -v
         continue-on-error: true
 
-      - name: Run full regression on schedule
-        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-        env:
-          PYTHONPATH: ${{ github.workspace }}
-          TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
-          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
-          BASE_URL: ${{ secrets.BASE_URL }}
-        run: |
-          mkdir -p reports/screenshots
-          pytest tests/ \
-            --browser ${{ matrix.browser }} \
-            --html=reports/${{ matrix.browser }}_report.html \
-            --self-contained-html \
-            -v
-        continue-on-error: true
-
-      - name: Upload report for ${{ matrix.browser }}
+      - name: Upload nightly report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: report-${{ matrix.browser }}
+          name: nightly-report-${{ matrix.browser }}
           path: |
-            reports/${{ matrix.browser }}_report.html
+            reports/nightly_${{ matrix.browser }}_report.html
             reports/screenshots/
-          retention-days: 14
+          retention-days: 30      # keep nightly reports longer
