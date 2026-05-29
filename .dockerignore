@@ -1,0 +1,13 @@
+.git
+.github
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+reports/*.html
+reports/screenshots/
+.idea
+*.md
+node_modules
+venv
+.env

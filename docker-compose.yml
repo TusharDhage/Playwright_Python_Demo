@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+
+  # Run all smoke tests
+  playwright-smoke:
+    build: .
+    container_name: playwright_smoke
+    environment:
+      - PYTHONPATH=/app
+      - TEST_USERNAME=${TEST_USERNAME:-student}
+      - TEST_PASSWORD=${TEST_PASSWORD:-Password123}
+      - BASE_URL=${BASE_URL:-https://practicetestautomation.com/practice-test-login/}
+    volumes:
+      - ./reports:/app/reports
+    command: >
+      pytest tests/ -m smoke
+      --html=reports/smoke_report.html
+      --self-contained-html -v
+
+  # Run full regression
+  playwright-regression:
+    build: .
+    container_name: playwright_regression
+    environment:
+      - PYTHONPATH=/app
+      - TEST_USERNAME=${TEST_USERNAME:-student}
+      - TEST_PASSWORD=${TEST_PASSWORD:-Password123}
+      - BASE_URL=${BASE_URL:-https://practicetestautomation.com/practice-test-login/}
+    volumes:
+      - ./reports:/app/reports
+    command: >
+      pytest tests/
+      --html=reports/regression_report.html
+      --self-contained-html -v
+
+  # Run only API tests
+  playwright-api:
+    build: .
+    container_name: playwright_api
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - ./reports:/app/reports
+    command: >
+      pytest tests/api/
+      --html=reports/api_report.html
+      --self-contained-html -v
