@@ -106,7 +106,11 @@ jobs:
         with:
           name: test-reports-${{ matrix.browser }}
           path: |
-            reports/
+            reports/api_smoke_report.html
+            reports/api_regression_report.html
+            reports/${{ matrix.browser }}_ui_smoke_report.html
+            reports/${{ matrix.browser }}_ui_regression_report.html
+            reports/screenshots/
           retention-days: 14
 
       - name: Notify Slack on failure
