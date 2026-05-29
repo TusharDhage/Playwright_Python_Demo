@@ -44,7 +44,19 @@ jobs:
       - name: Install Playwright browsers
         run: playwright install --with-deps ${{ matrix.browser }}
 
-      - name: Run smoke tests on push
+      - name: Run API smoke tests
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          mkdir -p reports
+          pytest tests/api/ -m smoke \
+            --html=reports/api_smoke_report.html \
+            --self-contained-html \
+            -v
+        continue-on-error: true
+
+      - name: Run UI smoke tests on push
         if: github.event_name == 'push' || github.event_name == 'pull_request'
         env:
           PYTHONPATH: ${{ github.workspace }}
@@ -53,14 +65,26 @@ jobs:
           BASE_URL: ${{ secrets.BASE_URL }}
         run: |
           mkdir -p reports/screenshots
-          pytest tests/ -m smoke \
+          pytest tests/ -m "smoke and not api" \
             --browser ${{ matrix.browser }} \
-            --html=reports/${{ matrix.browser }}_report.html \
+            --html=reports/${{ matrix.browser }}_ui_smoke_report.html \
             --self-contained-html \
             -v
         continue-on-error: true
 
-      - name: Run full regression on schedule
+      - name: Run full API regression on schedule
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          mkdir -p reports
+          pytest tests/api/ \
+            --html=reports/api_regression_report.html \
+            --self-contained-html \
+            -v
+        continue-on-error: true
+
+      - name: Run full UI regression on schedule
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         env:
           PYTHONPATH: ${{ github.workspace }}
@@ -69,21 +93,20 @@ jobs:
           BASE_URL: ${{ secrets.BASE_URL }}
         run: |
           mkdir -p reports/screenshots
-          pytest tests/ \
+          pytest tests/ -m "not api" \
             --browser ${{ matrix.browser }} \
-            --html=reports/${{ matrix.browser }}_report.html \
+            --html=reports/${{ matrix.browser }}_ui_regression_report.html \
             --self-contained-html \
             -v
         continue-on-error: true
 
-      - name: Upload report for ${{ matrix.browser }}
+      - name: Upload all reports
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: report-${{ matrix.browser }}
+          name: test-reports-${{ matrix.browser }}
           path: |
-            reports/${{ matrix.browser }}_report.html
-            reports/screenshots/
+            reports/
           retention-days: 14
 
       - name: Notify Slack on failure
