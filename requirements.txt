@@ -4,3 +4,5 @@ pytest-playwright
 pytest-html
 allure-pytest
 requests
+openpyxl
+pandas

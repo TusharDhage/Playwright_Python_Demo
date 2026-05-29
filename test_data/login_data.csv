@@ -1,0 +1,10 @@
+username,password,expected_result,test_type
+student,Password123,Logged In Successfully,valid
+wronguser,Password123,Your username is invalid!,invalid
+student,wrongpass,Your password is invalid!,invalid
+,,Your username is invalid!,empty
+
+
+
+
+
