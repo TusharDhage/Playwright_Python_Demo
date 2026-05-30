@@ -1,0 +1,7 @@
+reports/screenshots/
+reports/*.html
+allure-results/
+allure-history/
+.venv/
+__pycache__/
+*.pyc
