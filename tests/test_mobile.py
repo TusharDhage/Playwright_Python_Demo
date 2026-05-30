@@ -2,7 +2,7 @@ import os
 import pytest
 import allure
 from typing import Generator
-from playwright.sync_api import sync_playwright, Page, BrowserContext, ViewportSize
+from playwright.sync_api import Page, BrowserContext, ViewportSize
 
 
 MOBILE_DEVICES = [
@@ -15,43 +15,37 @@ MOBILE_DEVICES = [
 
 
 @pytest.fixture
-def mobile_page(request, browser_type_launch_args) -> Generator[tuple[Page, str], None, None]:
-    """Fixture that respects --headed and --slowmo flags"""
+def mobile_page(request, browser) -> Generator[tuple[Page, str], None, None]:
+    """Uses pytest-playwright built-in browser fixture"""
     device_name: str = request.param
-    with sync_playwright() as p:
-        # browser_type_launch_args contains headed/slowmo from CLI
-        browser = p.chromium.launch(**browser_type_launch_args)
-        device = p.devices[device_name]
-        viewport: ViewportSize = device.get("viewport")
-        context: BrowserContext = browser.new_context(
-            viewport=viewport,
-            user_agent=device.get("user_agent"),
-            has_touch=device.get("has_touch", False),
-            is_mobile=device.get("is_mobile", False),
-            device_scale_factor=device.get("device_scale_factor", 1),
-        )
-        page: Page = context.new_page()
-        yield page, device_name
-        context.close()
-        browser.close()
+    from playwright.sync_api import Playwright
+    playwright = request.getfixturevalue("playwright")
+    device = playwright.devices[device_name]
+    viewport: ViewportSize = device.get("viewport")
+    context: BrowserContext = browser.new_context(
+        viewport=viewport,
+        user_agent=device.get("user_agent"),
+        has_touch=device.get("has_touch", False),
+        is_mobile=device.get("is_mobile", False),
+        device_scale_factor=device.get("device_scale_factor", 1),
+    )
+    page: Page = context.new_page()
+    yield page, device_name
+    context.close()
 
 
 @pytest.fixture
-def custom_viewport_page(request, browser_type_launch_args) -> Generator[tuple[Page, str], None, None]:
-    """Fixture for custom viewport — respects --headed and --slowmo"""
+def custom_viewport_page(request, browser) -> Generator[tuple[Page, str], None, None]:
+    """Uses pytest-playwright built-in browser fixture"""
     width: int
     height: int
     width, height = request.param
-    with sync_playwright() as p:
-        browser = p.chromium.launch(**browser_type_launch_args)
-        viewport: ViewportSize = {"width": width, "height": height}
-        context: BrowserContext = browser.new_context(
-            viewport=viewport
-        )
-        page: Page = context.new_page()
-        yield page, f"{width}x{height}"
-        context.close()
-        browser.close()
+    viewport: ViewportSize = {"width": width, "height": height}
+    context: BrowserContext = browser.new_context(viewport=viewport)
+    page: Page = context.new_page()
+    yield page, f"{width}x{height}"
+    context.close()
+
 
 @allure.feature("Mobile Viewport")
 class TestMobileDevices:
