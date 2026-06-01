@@ -6,3 +6,7 @@ allure-pytest
 requests
 openpyxl
 pandas
+bandit
+jsonschema
+pytest-xdist
+allure-python-commons

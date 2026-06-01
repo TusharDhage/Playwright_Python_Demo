@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/api/payment/process"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "transactionId": "TXN-MOCK-12345",
+      "status": "SUCCESS",
+      "amount": 1500.00,
+      "currency": "INR",
+      "message": "Payment processed successfully (mocked by WireMock)"
+    }
+  }
+}

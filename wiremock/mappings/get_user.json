@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/users/1"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": 1,
+      "name": "Tushar Dhage",
+      "email": "tushar.dhage95@gmail.com",
+      "role": "QA Engineer",
+      "active": true
+    }
+  }
+}

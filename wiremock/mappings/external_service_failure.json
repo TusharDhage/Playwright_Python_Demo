@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/api/external/inventory"
+  },
+  "response": {
+    "status": 503,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": "Service Unavailable",
+      "message": "Inventory service is temporarily down (mocked failure)"
+    }
+  }
+}

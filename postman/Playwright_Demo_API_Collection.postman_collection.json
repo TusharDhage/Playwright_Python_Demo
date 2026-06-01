@@ -1,0 +1,164 @@
+{
+  "info": {
+    "name": "Playwright_Python_Demo - API Collection",
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "description": "API contract and manual validation collection for Playwright Python Demo project.\nUsed alongside Playwright API automation tests for exploratory testing.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://jsonplaceholder.typicode.com",
+      "type": "string"
+    },
+    {
+      "key": "wiremock_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "GET All Posts",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/posts", "host": ["{{base_url}}"], "path": ["posts"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Returns array', () => pm.expect(pm.response.json()).to.be.an('array'));",
+                  "pm.test('Has 100 posts', () => pm.expect(pm.response.json().length).to.equal(100));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Post by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/posts/1", "host": ["{{base_url}}"], "path": ["posts", "1"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Has required fields', () => {",
+                  "  pm.expect(body).to.have.keys(['id','userId','title','body']);",
+                  "});",
+                  "pm.test('ID is 1', () => pm.expect(body.id).to.equal(1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Post",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Post from Postman\",\n  \"body\": \"Contract validation\",\n  \"userId\": 1\n}"
+            },
+            "url": { "raw": "{{base_url}}/posts", "host": ["{{base_url}}"], "path": ["posts"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.test('Has id in response', () => pm.expect(body).to.have.property('id'));",
+                  "pm.test('Title matches', () => pm.expect(body.title).to.equal('Test Post from Postman'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE Post",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{base_url}}/posts/1", "host": ["{{base_url}}"], "path": ["posts", "1"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "WireMock Mocked Services",
+      "item": [
+        {
+          "name": "GET Mocked User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{wiremock_url}}/api/users/1", "host": ["{{wiremock_url}}"], "path": ["api","users","1"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Name is Tushar Dhage', () => pm.expect(body.name).to.equal('Tushar Dhage'));",
+                  "pm.test('User is active', () => pm.expect(body.active).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Mocked Payment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"amount\": 1500, \"currency\": \"INR\", \"userId\": 1}"
+            },
+            "url": { "raw": "{{wiremock_url}}/api/payment/process", "host": ["{{wiremock_url}}"], "path": ["api","payment","process"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test('Payment SUCCESS', () => pm.expect(body.status).to.equal('SUCCESS'));",
+                  "pm.test('Has transactionId', () => pm.expect(body.transactionId).to.be.a('string'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
