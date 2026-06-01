@@ -1,0 +1,11 @@
+
+Status: 200
+Response: {
+  "id": 3,
+  "name": "Clementine Bauch",
+  "username": "Samantha",
+  "email": "Nathan@yesenia.net",
+  "address": {
+    "street": "Douglas Extension",
+    "suite": "Suite 847",
+    "city": "McKenzieh

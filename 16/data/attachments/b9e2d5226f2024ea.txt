@@ -1,0 +1,8 @@
+
+Status: 201
+Response: {
+  "title": "Playwright API Test",
+  "body": "Testing API with requests library",
+  "userId": 1,
+  "id": 101
+}

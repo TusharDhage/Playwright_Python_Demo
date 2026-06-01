@@ -1,0 +1,11 @@
+
+Status: 200
+Response: {
+  "id": 5,
+  "name": "Chelsey Dietrich",
+  "username": "Kamren",
+  "email": "Lucio_Hettinger@annie.ca",
+  "address": {
+    "street": "Skiles Walks",
+    "suite": "Suite 351",
+    "city": "Roscoeview
